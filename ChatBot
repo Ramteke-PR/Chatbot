@@ -1,1 +1,49 @@
+import numpy as np
+import tensorflow as tf
+import re
+import time
 
+lines = open("Path of the dataset", encoding='UTF-8', error='ignore').read().split("\n")
+conversations = open("Path of the dataset", encoding='UTF-8', error='ignore').read().split("\n")
+
+id2lines = {}
+for line in lines:
+    _line = line.split(' +++$+++ ')
+    if len(_line) ==5:
+        id2lines[_line[0]] = _line[4]
+
+
+conversation_ids = []
+for conversation in conversations[:-1]:
+    _conversation =conversation.split(" +++$+++ ")[-1][1:-1].replace("'","").replace(" ","")
+    conversation_ids.append(_conversation.split(","))
+    
+questions = []
+answer = []
+    
+question = []
+answer = []
+for conversation in conversation_ids:
+    for i in range(len(conversation)-1):
+        question.append(id2lines[conversation[i]])
+        answer.append(id2lines[conversation[i+1]])
+        
+def clean_text(text):
+    text = re.sub(r"\'m", " am", text)
+    text = re.sub(r"\'s", " is", text)
+    text = re.sub(r"\'re", " are", text)
+    text = re.sub(r"\'ll", " will", text)
+    text = re.sub(r"\'d", " would", text)
+    text = re.sub(r"won't", "will not", text)
+    text = re.sub(r"can't", "cannot", text)
+    text = re.sub(r"\.", " . ", text)
+    text = re.sub(r"\?", " ? ", text)
+    text = re.sub(r"!", " ! ", text)
+    text = re.sub(r"/", " / ", text)
+    text = re.sub(r",", " , ", text)
+    text = re.sub(r'"', ' " ', text)
+    text = re.sub(r"-", " - ", text)
+
+    text = re.sub(r"[-<>{}+=|?'()\:@]", "", text)
+    return text.replace('\n', '')
+    
